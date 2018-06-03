@@ -1,8 +1,8 @@
 const request = require('request');
 
-function sendMessage(event) {
+function sendMessage(event, messageToUser) {
     let sender = event.sender.id;
-    let text = event.message.text;
+    let text = messageToUser;
 
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
@@ -28,7 +28,6 @@ function sendMessage(event) {
 }
 
 function getWeather(event) {
-    console.log('ana geet');
     let apiKey = '4fd9814c4adefbed83bd6f5a3ef05390';
     messageAttachments = event.message.attachments;
     var lat = null;
@@ -36,17 +35,19 @@ function getWeather(event) {
     if (messageAttachments[0].payload.coordinates) {
         lat = messageAttachments[0].payload.coordinates.lat;
         lon = messageAttachments[0].payload.coordinates.long;
-        console.log("lat : " + lat + " ,long : " + lon + "\n");
+        //console.log("lat : " + lat + " ,long : " + lon + "\n");
 
     }
-    var url = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
+    var url = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
     request(url, function(err, response, body) {
         if (err) {
             console.log('error:', error);
         } else {
             let weather = JSON.parse(body)
-            let message = `It's ${weather.main.temp} degrees in ${weather.name}!`;
+            let message = `It's ${weather.main.temp} degrees Celsuis in ${weather.name}!`;
+
             console.log(message);
+            sendMessage(event, message);
         }
     });
 }
@@ -71,7 +72,7 @@ module.exports = function(app) {
                 entry.messaging.forEach((event) => {
                     //in the case of text
                     if (event.message && event.message.text) {
-                        sendMessage(event);
+                        sendMessage(event,event.message.text);
                     }
                     //in case of location
                     if (event.message && event.message.attachments) {
