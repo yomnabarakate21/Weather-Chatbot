@@ -149,14 +149,16 @@ module.exports = function(app) {
     });
 
     app.post('/ai', (req, res) => {
-        console.log(req.body.queryResult.parameters.number );
         if (req.body.queryResult.action === 'weather') {
+            var restUrl = null;
             if (req.body.queryResult.parameters['geo-city']) {
                 let city = req.body.queryResult.parameters['geo-city'];
-                var restUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
+                 restUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
             }
             else if (req.body.queryResult.parameters.number && req.body.queryResult.parameters.number1){
-                console.log(req.body);
+                let lat = req.body.queryResult.parameters.number;
+                let lon = req.body.queryResult.parameters.number1;
+                 restUrl = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
             }
 
             request.get(restUrl, (err, response, body) => {
