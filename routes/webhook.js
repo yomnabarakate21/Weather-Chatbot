@@ -1,41 +1,58 @@
 const request = require('request');
+const apiaiApp = require('apiai')('cb6cc2762df7498cb7e44b0ce9dfa04e');
+const apiKey = '4fd9814c4adefbed83bd6f5a3ef05390';
 
-function sendMessage(event, messageToUser) {
+function sendMessage(event) {
+
     let sender = event.sender.id;
-    let text = messageToUser;
-
-    request({
-        url: 'https://graph.facebook.com/v2.6/me/messages',
-        qs: {
-            access_token: 'EAAC1XoDkqLgBAPjVmuN9mV3BqoCkhhN9b2d915jc9LYZAj8WN8ZAtGZCZC0hXjWeQDekEhSXRqtWcHlkXVjkZCiBA3R9i5hDmFY6cYOBaZABE7P15bIXZAdG570q8DuxHNDpLtZABINQ2nAmx5gA5uQJCwkseL7Hx9eYZBUp8Lk9UkolPa1DKcPAY'
-        },
-        method: 'POST',
-        json: {
-            recipient: {
-                id: sender
-            },
-            message: {
-                text: text
-            }
-        }
-    }, function(error, response) {
-        if (error) {
-            console.log('Error sending message: ', error);
-        } else if (response.body.error) {
-            console.log('Error: ', response.body.error);
-        }
+    let text = event.message.text;
+    let apiai = apiaiApp.textRequest(text, {
+        sessionId: 'random' // use any arbitrary id
     });
+
+    apiai.on('response', (response) => {
+        // Got a response from api.ai. Let's POST to Facebook Messenger
+        let aiText = response.result.fulfillment.speech;
+        request({
+            url: 'https://graph.facebook.com/v2.6/me/messages',
+            qs: {
+                access_token: 'EAAC1XoDkqLgBAMRzhWeQsU0uZCrZCdL5GdZAZBanN72jfXbtecO5kq7svT6P6xtt46R5N3jo7A6Xvh1M5yuB0BstFdUTQhqq98BOmCB0nd2972p5CSZAgqG2KDc7DZBHyNcHfpQljpaH7oJF8mIOrHKZAtqpm1ZCgYnrjiIIHdl3HWUD5VCcMiZBz'
+            },
+            method: 'POST',
+            json: {
+                recipient: {
+                    id: sender
+                },
+                message: {
+                    text: aiText
+                }
+            }
+        }, function(error, response) {
+            if (error) {
+                console.log('Error sending message: ', error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+            }
+        });
+
+    });
+
+    apiai.on('error', (error) => {
+        console.log(error);
+    });
+
+    apiai.end();
+
+
 }
 
 function getWeather(event) {
-    let apiKey = '4fd9814c4adefbed83bd6f5a3ef05390';
     messageAttachments = event.message.attachments;
     var lat = null;
     var lon = null;
     if (messageAttachments[0].payload.coordinates) {
         lat = messageAttachments[0].payload.coordinates.lat;
         lon = messageAttachments[0].payload.coordinates.long;
-        //console.log("lat : " + lat + " ,long : " + lon + "\n");
 
     }
     var url = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
@@ -47,7 +64,7 @@ function getWeather(event) {
             let message = `It's ${weather.main.temp} degrees Celsuis in ${weather.name}!`;
 
             console.log(message);
-            sendMessage(event, message);
+            sendMessage(event);
         }
     });
 }
@@ -72,11 +89,11 @@ module.exports = function(app) {
                 entry.messaging.forEach((event) => {
                     //in the case of text
                     if (event.message && event.message.text) {
-                        sendMessage(event,event.message.text);
+                        sendMessage(event);
                     }
                     //in case of location
                     if (event.message && event.message.attachments) {
-                        getWeather(event);
+                        //getWeather(event);
 
                     }
                 });
@@ -85,7 +102,31 @@ module.exports = function(app) {
         }
     });
 
+    app.post('/ai', (req, res) => {
+        if (req.body.queryResult.action === 'weather') {
+            let city = req.body.queryResult.parameters['geo-city'];
+            var restUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
 
+            request.get(restUrl, (err, response, body) => {
+                if (!err && response.statusCode == 200) {
+                    let json = JSON.parse(body);
+                    let msg = json.weather[0].description + ' and the temperature is ' + json.main.temp + ' C';
+                    console.log(msg);
+                    return res.json({
+                        fulfillmentText: msg,
+                        source: 'weather'
+                    });
+                } else {
+                    return res.status(400).json({
+                        status: {
+                            code: 400,
+                            errorType: 'I failed to look up the city name.'
+                        }
+                    });
+                }
+            })
+        }
+    });
 
 
 }
