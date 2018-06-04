@@ -1,7 +1,8 @@
 const request = require('request');
+const geocoder = require('geocoder');
 const apiaiApp = require('apiai')('cb6cc2762df7498cb7e44b0ce9dfa04e');
 const apiKey = '4fd9814c4adefbed83bd6f5a3ef05390';
- PAGE_ACCESS_TOKEN = 'EAAC1XoDkqLgBAMRzhWeQsU0uZCrZCdL5GdZAZBanN72jfXbtecO5kq7svT6P6xtt46R5N3jo7A6Xvh1M5yuB0BstFdUTQhqq98BOmCB0nd2972p5CSZAgqG2KDc7DZBHyNcHfpQljpaH7oJF8mIOrHKZAtqpm1ZCgYnrjiIIHdl3HWUD5VCcMiZBz'
+PAGE_ACCESS_TOKEN = 'EAAC1XoDkqLgBAMRzhWeQsU0uZCrZCdL5GdZAZBanN72jfXbtecO5kq7svT6P6xtt46R5N3jo7A6Xvh1M5yuB0BstFdUTQhqq98BOmCB0nd2972p5CSZAgqG2KDc7DZBHyNcHfpQljpaH7oJF8mIOrHKZAtqpm1ZCgYnrjiIIHdl3HWUD5VCcMiZBz'
 
 function sendMessage(event, Location) {
     let sender = event.sender.id;
@@ -34,7 +35,23 @@ function sendMessage(event, Location) {
 function sendMessageFromApi(event) {
 
     let sender = event.sender.id;
-    let text = event.message.text;
+    let text = null;
+    if (event.message && event.message.attachments) {
+        messageAttachments = event.message.attachments;
+        var lat = null;
+        var lon = null;
+        if (messageAttachments[0].payload.coordinates) {
+            lat = messageAttachments[0].payload.coordinates.lat;
+            lon = messageAttachments[0].payload.coordinates.long;
+            text = `What's the weather in ${lat} , ${lon} ?`;
+
+        }
+
+    } else {
+        text = event.message.text;
+
+    }
+    console.log(text);
     let apiai = apiaiApp.textRequest(text, {
         sessionId: 'random' // use any arbitrary id
     });
@@ -45,7 +62,7 @@ function sendMessageFromApi(event) {
         request({
             url: 'https://graph.facebook.com/v2.6/me/messages',
             qs: {
-                access_token:PAGE_ACCESS_TOKEN
+                access_token: PAGE_ACCESS_TOKEN
             },
             method: 'POST',
             json: {
@@ -121,7 +138,8 @@ module.exports = function(app) {
                     }
                     //in case of location
                     if (event.message && event.message.attachments) {
-                        getWeather(event);
+                        //getWeather(event);
+                        sendMessageFromApi(event);
 
                     }
                 });
@@ -131,10 +149,8 @@ module.exports = function(app) {
     });
 
     app.post('/ai', (req, res) => {
-
+        console.log ('I am here from the api.ai');
         if (req.body.queryResult.action === 'weather') {
-            console.log(' am printing the request here');
-            console.log(req.body);
             let city = req.body.queryResult.parameters['geo-city'];
             var restUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
 
