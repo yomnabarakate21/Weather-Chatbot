@@ -1,8 +1,37 @@
 const request = require('request');
 const apiaiApp = require('apiai')('cb6cc2762df7498cb7e44b0ce9dfa04e');
 const apiKey = '4fd9814c4adefbed83bd6f5a3ef05390';
+ PAGE_ACCESS_TOKEN = 'EAAC1XoDkqLgBAMRzhWeQsU0uZCrZCdL5GdZAZBanN72jfXbtecO5kq7svT6P6xtt46R5N3jo7A6Xvh1M5yuB0BstFdUTQhqq98BOmCB0nd2972p5CSZAgqG2KDc7DZBHyNcHfpQljpaH7oJF8mIOrHKZAtqpm1ZCgYnrjiIIHdl3HWUD5VCcMiZBz'
 
-function sendMessage(event) {
+function sendMessage(event, Location) {
+    let sender = event.sender.id;
+    let text = Location;
+
+    request({
+        url: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: {
+            access_token: PAGE_ACCESS_TOKEN
+        },
+        method: 'POST',
+        json: {
+            recipient: {
+                id: sender
+            },
+            message: {
+                text: text
+            }
+        }
+    }, function(error, response) {
+        if (error) {
+            console.log('Error sending message: ', error);
+        } else if (response.body.error) {
+            console.log('Error: ', response.body.error);
+        }
+    });
+
+}
+
+function sendMessageFromApi(event) {
 
     let sender = event.sender.id;
     let text = event.message.text;
@@ -16,7 +45,7 @@ function sendMessage(event) {
         request({
             url: 'https://graph.facebook.com/v2.6/me/messages',
             qs: {
-                access_token: 'EAAC1XoDkqLgBAMRzhWeQsU0uZCrZCdL5GdZAZBanN72jfXbtecO5kq7svT6P6xtt46R5N3jo7A6Xvh1M5yuB0BstFdUTQhqq98BOmCB0nd2972p5CSZAgqG2KDc7DZBHyNcHfpQljpaH7oJF8mIOrHKZAtqpm1ZCgYnrjiIIHdl3HWUD5VCcMiZBz'
+                access_token:PAGE_ACCESS_TOKEN
             },
             method: 'POST',
             json: {
@@ -60,11 +89,10 @@ function getWeather(event) {
         if (err) {
             console.log('error:', error);
         } else {
-            let weather = JSON.parse(body)
-            let message = `It's ${weather.main.temp} degrees Celsuis in ${weather.name}!`;
-
+            let json = JSON.parse(body)
+            let message = `It's ${json.weather[0].description} and the temperature is ${json.main.temp} degrees Celsuis in ${json.name}!`;
             console.log(message);
-            sendMessage(event);
+            sendMessage(event, message);
         }
     });
 }
@@ -89,11 +117,11 @@ module.exports = function(app) {
                 entry.messaging.forEach((event) => {
                     //in the case of text
                     if (event.message && event.message.text) {
-                        sendMessage(event);
+                        sendMessageFromApi(event);
                     }
                     //in case of location
                     if (event.message && event.message.attachments) {
-                        //getWeather(event);
+                        getWeather(event);
 
                     }
                 });
@@ -103,7 +131,10 @@ module.exports = function(app) {
     });
 
     app.post('/ai', (req, res) => {
+
         if (req.body.queryResult.action === 'weather') {
+            console.log(' am printing the request here');
+            console.log(req.body);
             let city = req.body.queryResult.parameters['geo-city'];
             var restUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
 
