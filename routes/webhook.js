@@ -166,7 +166,7 @@ module.exports = function(app) {
             request.get(restUrl, (err, response, body) => {
                 if (!err && response.statusCode == 200) {
                     let json = JSON.parse(body);
-                    let msg = json.weather[0].description + ' and the temperature is ' + json.main.temp + ' C';
+                    let msg = json.weather[0].description + ' and the temperature is ' + json.main.temp + ' C' + 'in' + json.name;
                     console.log(msg);
                     return res.json({
                         fulfillmentText: msg,
