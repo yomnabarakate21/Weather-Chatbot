@@ -172,8 +172,10 @@ module.exports = function(app) {
                         fulfillmentText: msg,
                         source: 'weather',
                         outputContexts:[{
-                            "geo-city" : json.name,
-                            "geo-city.original": json.name
+                            parameters:{
+                                "geo-city" : json.name,
+                            }
+
 
                         }]
 
