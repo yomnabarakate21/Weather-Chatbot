@@ -118,7 +118,7 @@ function getWeather(event) {
 module.exports = function(app) {
     //validation for facebook login
     app.get('/webhook', (req, res) => {
-        if (req.query['hub.mode'] && req.query['hub.verify_token'] === 'random') {
+        if (req.query['hub.mode'] && req.query['hub.verify_token'] === process.env.VERIFICATION_TOKEN) {
             res.status(200).send(req.query['hub.challenge']);
         } else {
             console.log('nothing here')
