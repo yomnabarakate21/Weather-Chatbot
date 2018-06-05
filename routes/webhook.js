@@ -59,6 +59,7 @@ function sendMessageFromApi(event) {
     apiai.on('response', (response) => {
         // Got a response from api.ai. Let's POST to Facebook Messenger
         let aiText = response.result.fulfillment.speech;
+        console.log(aiText);
         request({
             url: 'https://graph.facebook.com/v2.6/me/messages',
             qs: {
