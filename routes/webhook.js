@@ -171,6 +171,13 @@ module.exports = function(app) {
                     return res.json({
                         fulfillmentText: msg,
                         source: 'weather',
+                        outputContexts: [{
+
+                            parameters: {
+                                geo-city: json.name,
+                                geo-city.original:json.name
+                            }
+                        }]
 
                     });
                 } else {
