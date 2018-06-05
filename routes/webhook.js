@@ -43,7 +43,7 @@ function sendMessageFromApi(event) {
         if (messageAttachments[0].payload.coordinates) {
             lat = messageAttachments[0].payload.coordinates.lat;
             lon = messageAttachments[0].payload.coordinates.long;
-            text = `What's the weather in ${lat} , ${lon} ?`;
+            text = `What's the weather in ${lat} , ${lon} in Dubai ?`;
 
         }
 
@@ -151,14 +151,13 @@ module.exports = function(app) {
     app.post('/ai', (req, res) => {
         if (req.body.queryResult.action === 'weather') {
             var restUrl = null;
-            if (req.body.queryResult.parameters['geo-city']) {
-                let city = req.body.queryResult.parameters['geo-city'];
-                 restUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
-            }
-            else if (req.body.queryResult.parameters.number && req.body.queryResult.parameters.number1){
+            if (req.body.queryResult.parameters.number && req.body.queryResult.parameters.number1) {
                 let lat = req.body.queryResult.parameters.number;
                 let lon = req.body.queryResult.parameters.number1;
-                 restUrl = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
+                restUrl = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
+            } else if (req.body.queryResult.parameters['geo-city']) {
+                let city = req.body.queryResult.parameters['geo-city'];
+                restUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
             }
 
             request.get(restUrl, (err, response, body) => {
