@@ -174,8 +174,8 @@ module.exports = function(app) {
                         outputContexts: [{
 
                             parameters: {
-                                geo-city: json.name,
-                                geo-city.original:json.name
+                                'geo-city': json.name,
+                                'geo-city.original':json.name
                             }
                         }]
 
