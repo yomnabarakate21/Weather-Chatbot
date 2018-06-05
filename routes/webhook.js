@@ -171,8 +171,12 @@ module.exports = function(app) {
                     return res.json({
                         fulfillmentText: msg,
                         source: 'weather',
-                        outputContexts[0].geo-city :json.name,
-                        outputContexts[0].geo-city.original :json.name
+                        outputContexts:[{
+                            "geo-city" : json.name,
+                            "geo-city.original": json.name
+
+                        }]
+
                     });
                 } else {
                     return res.status(400).json({
