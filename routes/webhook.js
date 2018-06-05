@@ -2,7 +2,7 @@ const request = require('request');
 const geocoder = require('geocoder');
 const apiaiApp = require('apiai')('cb6cc2762df7498cb7e44b0ce9dfa04e');
 const apiKey = '4fd9814c4adefbed83bd6f5a3ef05390';
-PAGE_ACCESS_TOKEN = 'EAAC1XoDkqLgBAMRzhWeQsU0uZCrZCdL5GdZAZBanN72jfXbtecO5kq7svT6P6xtt46R5N3jo7A6Xvh1M5yuB0BstFdUTQhqq98BOmCB0nd2972p5CSZAgqG2KDc7DZBHyNcHfpQljpaH7oJF8mIOrHKZAtqpm1ZCgYnrjiIIHdl3HWUD5VCcMiZBz'
+PAGE_ACCESS_TOKEN = 'EAAC1XoDkqLgBACMUSSkwdBjsGEaZCPxhWwtZBYv9gEeQ8sVnREkTO57Q53UrZBLVURKUwK9DTNFdxMgAZCRgs9Yfpn5YpDAPooxymciFvd5GStb5BWukeHG1A3ENETiqkMthjL8BhCbGv54KZB4bfxOmTx2flgNudo7YRPtzKlA2ZA5ORsYsvt'
 
 function sendMessage(event, Location) {
     let sender = event.sender.id;
