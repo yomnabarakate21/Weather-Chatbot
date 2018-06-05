@@ -173,7 +173,7 @@ module.exports = function(app) {
                         source: 'weather',
                         outputContexts:[{
                             parameters:{
-                                "geo-city" : json.name,
+                                geo-city : json.name,
                             }
 
 
