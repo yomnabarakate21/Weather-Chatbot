@@ -171,6 +171,15 @@ module.exports = function(app) {
                     return res.json({
                         'fulfillmentText': msg,
                         'source': 'weather',
+                        "outputContexts": [{
+                            "name": "projects/weather-bot-fdd00/agent/sessions/a1a13100-e04b-0d56-c9d3-d0b22cf39116/contexts/location",
+                            "lifespanCount": 5,
+                            "parameters": {
+                                "geo-city.original": json.name,
+                                "geo-city": json.name,
+
+                            }
+                        }]
 
                     });
                 } else {
