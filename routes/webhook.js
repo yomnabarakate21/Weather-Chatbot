@@ -59,7 +59,6 @@ function sendMessageFromApi(event) {
     apiai.on('response', (response) => {
         // Got a response from api.ai. Let's POST to Facebook Messenger
         let aiText = response.result.fulfillment.speech;
-        console.log(aiText);
         request({
             url: 'https://graph.facebook.com/v2.6/me/messages',
             qs: {
@@ -118,7 +117,7 @@ function getWeather(event) {
 
 module.exports = function(app) {
     //validation for facebook login
-    app.get('/', (req, res) => {
+    app.get('/webhook', (req, res) => {
         if (req.query['hub.mode'] && req.query['hub.verify_token'] === 'random') {
             res.status(200).send(req.query['hub.challenge']);
         } else {
@@ -126,9 +125,12 @@ module.exports = function(app) {
             res.status(403).end();
         }
     });
+    app.get("/", function(req, res) {
+        res.send("Deployed!");
+    });
 
     /* Handling all messenges */
-    app.post('/', (req, res) => {
+    app.post('/webhook', (req, res) => {
         console.log(req.body);
         if (req.body.object === 'page') {
             req.body.entry.forEach((entry) => {
