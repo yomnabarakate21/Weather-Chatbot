@@ -169,11 +169,11 @@ module.exports = function(app) {
                     let msg = json.weather[0].description + ' and the temperature is ' + json.main.temp + ' Celsuis ' + 'in ' + json.name;
                     console.log(msg);
                     return res.json({
-                        fulfillmentText: msg,
-                        source: 'weather',
-                        outputContexts: [{
+                        'fulfillmentText': msg,
+                        'source': 'weather',
+                        'outputContexts': [{
 
-                            parameters: {
+                            'parameters': {
                                 'geo-city': json.name,
                                 'geo-city.original':json.name
                             }
