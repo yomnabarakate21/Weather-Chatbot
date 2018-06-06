@@ -1,9 +1,8 @@
 const request = require('request');
 const apiaiApp = require('apiai')('cb6cc2762df7498cb7e44b0ce9dfa04e');
-const WEATHER_API_KEY = '4fd9814c4adefbed83bd6f5a3ef05390';
+const apiKey = '4fd9814c4adefbed83bd6f5a3ef05390';
 module.exports = function(app) {
     app.post('/ai', (req, res) => {
-
         if (req.body.queryResult.action === 'weather') {
             var restUrl = null;
             //in case a locattion with lat and lon was given
@@ -21,7 +20,6 @@ module.exports = function(app) {
                 if (!err && response.statusCode == 200) {
                     let json = JSON.parse(body);
                     let msg = json.weather[0].description + ' and the temperature is ' + json.main.temp + ' Celsuis ' + 'in ' + json.name;
-                    console.log(msg);
                     return res.json({
                         'fulfillmentText': msg,
                         'source': 'weather',
