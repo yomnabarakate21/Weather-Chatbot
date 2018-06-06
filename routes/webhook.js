@@ -192,6 +192,15 @@ module.exports = function(app) {
                 }
             })
         }
+        else if (req.body.queryResult.action === 'details'){
+            return res.json({
+                'fulfillmentText': 'hi from the webhook!',
+                'source': 'weather',
+
+            });
+
+
+        }
     });
 
 
