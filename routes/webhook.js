@@ -193,11 +193,40 @@ module.exports = function(app) {
             })
         }
         else if (req.body.queryResult.action === 'details'){
-            return res.json({
-                'fulfillmentText': 'hi from the webhook!',
-                'source': 'weather',
+            if(req.body.queryResult.parameters.loc){
+                let city = req.body.queryResult.parameters.loc;
+                restUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+                request.get(restUrl, (err, response, body) => {
+                    if (!err && response.statusCode == 200) {
+                        let json = JSON.parse(body);
+                        let msg ='temp = ' + json.main.temp+ ' humidity = '+json.main.humidity + '\n  pressure = ' + json.main.pressure + '\n min_temp = ' + json.main.temp_min +' max_temp = ' +json.main.temp_max ;
+                        return res.json({
+                            'fulfillmentText': msg,
+                            'source': 'details',
+                            "outputContexts": [{
+                                "name": "projects/weather-bot-fdd00/agent/sessions/a1a13100-e04b-0d56-c9d3-d0b22cf39116/contexts/location",
+                                "lifespanCount": 5,
+                                "parameters": {
+                                    "geo-city.original": json.name,
+                                    "geo-city": json.name,
 
-            });
+                                }
+                            }]
+
+                        });
+                    } else {
+                        return res.status(400).json({
+                            status: {
+                                code: 400,
+                                errorType: 'I failed to look up the city name.'
+                            }
+                        });
+                    }
+                });
+
+
+            }
+
 
 
         }
