@@ -126,7 +126,7 @@ module.exports = function(app) {
         }
     });
     app.get("/", function(req, res) {
-        res.send(" hiiiiiiiiiii \r\n Deployed!");
+        res.send("Deployed!");
     });
 
     /* Handling all messenges */
@@ -199,7 +199,7 @@ module.exports = function(app) {
                 request.get(restUrl, (err, response, body) => {
                     if (!err && response.statusCode == 200) {
                         let json = JSON.parse(body);
-                        let msg ='temp = ' + json.main.temp+ '\r\n humidity = '+json.main.humidity + '\r\n  pressure = ' + json.main.pressure + '\r\n min_temp = ' + json.main.temp_min +'\r\n max_temp = ' +json.main.temp_max ;
+                        let msg ='temp = ' + json.main.temp+ ' Celsuis\r\nhumidity = '+json.main.humidity + '%\r\npressure = ' + json.main.pressure + 'hPa\r\nmin_temp = ' + json.main.temp_min +' Celsuis \r\nmax_temp = ' +json.main.temp_max +' Celcuis';
                         return res.json({
                             'fulfillmentText': msg,
                             'source': 'details',
